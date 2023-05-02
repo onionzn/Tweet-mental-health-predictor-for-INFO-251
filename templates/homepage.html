@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Submit Form Example</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+	<h1>Please enter your Twitter username</h1>
+	<form action="http://127.0.0.1:5000/" method="post">
+		<label for="username">Twitter username:</label>
+		<input type="text" id="username" name="username"><br><br>
+		<label for="model">Model:</label>
+		<select id="model" name="model">
+			<option value="distilbert_neural_networks">DistilBERT + Neural Networks</option>
+		</select><br><br>
+		{% if user_not_found %}
+			<p>User not found! Please try a different username.</p>
+		{% endif %}
+		<input type="submit" value="Check your mental health evaluation">
+	</form>
+
+	{% if no_tweets_available %}
+		<p>The Twitter user has not posted any Tweets.</p>
+	{% endif %}
+
+	{% if tweets %}
+	<table>
+		<thead>
+		  <tr>
+			<th>Tweet</th>
+			<th>Mental Health Status</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {%  for i in range(tweets|length) %}
+			<tr>
+			  <td>{{ tweets[i] }}</td>
+			  {% if predictions[i] == 0 %}
+				  <td>😊</td>
+			  {% elif predictions[i] == 1 %}
+				  <td>😔</td>
+			  {% endif %}
+			</tr>
+		  {% endfor %}
+		</tbody>
+	  </table>
+	{% endif %}
+</body>
+</html>
