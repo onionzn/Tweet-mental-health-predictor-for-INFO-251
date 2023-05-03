@@ -2,9 +2,7 @@ import requests, csv
 import os
 import json
 
-# To set your environment variables in your terminal run the following line:
-# export 'BEARER_TOKEN'='<your_bearer_token>'
-bearer_token = "placeholder"
+bearer_token = os.environ.get('MY_TOKEN')
 fetch_tweets_url = "https://api.twitter.com/2/users/{0}/tweets"
 username_url = "https://api.twitter.com/2/users/by/username/{0}"
 
