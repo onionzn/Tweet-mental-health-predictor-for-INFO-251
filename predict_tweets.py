@@ -8,7 +8,10 @@ import tensorflow as tf
 from tensorflow import keras
 from transformers import TFDistilBertModel
 from tensorflow.keras.layers import Dropout
-from tensorflow.keras import regularizers
+from tensorflow.keras import regularizer
+from pathlib import Path
+
+THIS_FOLDER = Path(__file__).parent.resolve()
 
 def make_prediction_for_username(username, distilbert=False):
 
@@ -17,11 +20,11 @@ def make_prediction_for_username(username, distilbert=False):
 
     # Load training dataset
     if distilbert:
-        train_df = pd.read_csv('train_df_distilbert.csv')
-        test_df = pd.read_csv('test_df_distilbert.csv')
+        train_df = pd.read_csv(THIS_FOLDER / 'train_df_distilbert.csv')
+        test_df = pd.read_csv(THIS_FOLDER / 'test_df_distilbert.csv')
     else:
-        train_df = pd.read_csv('train_df_bert.csv')
-        test_df = pd.read_csv('test_df_bert.csv')
+        train_df = pd.read_csv(THIS_FOLDER / 'train_df_bert.csv')
+        test_df = pd.read_csv(THIS_FOLDER / 'test_df_bert.csv')
    
     # Tokenize the tweets
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -40,11 +43,11 @@ def make_prediction_for_username(username, distilbert=False):
 
     # Load the saved embeddings from files
     if distilbert:
-        train_embeddings = np.load('train_embeddings_distilbert_1500rows.npy')
-        test_embeddings = np.load('test_embeddings_distilbert_1500rows.npy')
+        train_embeddings = np.load(THIS_FOLDER / 'train_embeddings_distilbert_1500rows.npy')
+        test_embeddings = np.load(THIS_FOLDER / 'test_embeddings_distilbert_1500rows.npy')
     else:
-        train_embeddings = np.load('train_embeddings_bert_1500rows.npy')
-        test_embeddings = np.load('test_embeddings_bert_1500rows.npy')
+        train_embeddings = np.load(THIS_FOLDER / 'train_embeddings_bert_1500rows.npy')
+        test_embeddings = np.load(THIS_FOLDER / 'test_embeddings_bert_1500rows.npy')
 
     # Define the neural network model
     if distilbert:
