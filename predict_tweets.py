@@ -11,30 +11,27 @@ from tensorflow.keras.layers import Dropout
 from tensorflow.keras import regularizers
 
 def make_prediction_for_username_distilbert_nn(username):
-    # Load the dataset
-    df = pd.read_csv('mental_health.csv')
-    df = df.iloc[:1500]
 
     # Load the tweets dataset
     df_tweets = pd.read_csv('tweets_{0}.csv'.format(username))
 
-    # Split the dataset into training and testing sets
-    train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
+    # Load training dataset
+    train_df = pd.read_csv('train_df_distilbert.csv')
    
-    # Tokenize the text data
+    # Tokenize the tweets
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     tweet_encodings = tokenizer(df_tweets['tweet'].tolist(), truncation=True, padding=True)
 
-    # Get features and attention mask
+    # Get features and attention mask from tweet_encodings
     tweet_features = np.array(tweet_encodings['input_ids'])
     tweet_attention_mask = np.array(tweet_encodings['attention_mask'])
 
-    # Create embeddings
+    # Create embeddings for tweets
     bert_model = TFDistilBertModel.from_pretrained('distilbert-base-uncased')    
     tweet_embeddings = bert_model([tweet_features, tweet_attention_mask])[0][:, 0, :]
 
     # Load the saved embeddings from files
-    train_embeddings = np.load('train_embeddings_distill_1500rows.npy')
+    train_embeddings = np.load('train_embeddings_distilbert_1500rows.npy')
 
     # Define the neural network model
     model = keras.Sequential([
