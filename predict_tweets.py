@@ -1,14 +1,12 @@
 import pandas as pd
 import numpy as np
-from sklearn.feature_selection import SelectKBest, chi2
-from sklearn.model_selection import train_test_split
 from transformers import BertTokenizer
 from transformers import TFBertModel
 import tensorflow as tf
 from tensorflow import keras
 from transformers import TFDistilBertModel
 from tensorflow.keras.layers import Dropout
-from tensorflow.keras import regularizer
+from tensorflow.keras import regularizers
 from pathlib import Path
 
 THIS_FOLDER = Path(__file__).parent.resolve()
