@@ -2,7 +2,7 @@ import requests, csv
 import os
 import json
 
-bearer_token = os.environ.get('MY_TOKEN')
+bearer_token = os.getenv('MY_TOKEN')
 fetch_tweets_url = "https://api.twitter.com/2/users/{0}/tweets"
 username_url = "https://api.twitter.com/2/users/by/username/{0}"
 
