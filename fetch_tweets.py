@@ -4,7 +4,7 @@ import json
 
 # To set your environment variables in your terminal run the following line:
 # export 'BEARER_TOKEN'='<your_bearer_token>'
-bearer_token = "AAAAAAAAAAAAAAAAAAAAAMrAmQEAAAAAtr00x4a9Uus8xWpynQxeYapnl4c%3D9xJEXsjdX1CDdy1m6zQojOwMDhsbE0dneGOn8v8Txa5zYqRgAZ"
+bearer_token = "placeholder"
 fetch_tweets_url = "https://api.twitter.com/2/users/{0}/tweets"
 username_url = "https://api.twitter.com/2/users/by/username/{0}"
 
