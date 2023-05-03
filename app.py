@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from fetch_tweets import get_user_id_by_username, get_tweets_by_user_id, make_tweets_csv
-from predict_tweets import make_prediction_for_username_distilbert_nn
+from predict_tweets import make_prediction_for_username
 import os
 from builtins import zip
 
@@ -26,7 +26,11 @@ def homepage():
         make_tweets_csv(tweets, username)
 
         # Make predictions
-        predictions = make_prediction_for_username_distilbert_nn(username)
+        if model == 'distilbert_neural_networks':
+            print("distil bert is used!!")
+            predictions = make_prediction_for_username(username, True)
+        else:
+            predictions = make_prediction_for_username(username, False)
 
         # Delete the .csv file
         os.remove('./tweets_{0}.csv'.format(username))

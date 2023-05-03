@@ -10,13 +10,18 @@ from transformers import TFDistilBertModel
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras import regularizers
 
-def make_prediction_for_username_distilbert_nn(username):
+def make_prediction_for_username(username, distilbert=False):
 
     # Load the tweets dataset
     df_tweets = pd.read_csv('tweets_{0}.csv'.format(username))
 
     # Load training dataset
-    train_df = pd.read_csv('train_df_distilbert.csv')
+    if distilbert:
+        train_df = pd.read_csv('train_df_distilbert.csv')
+        test_df = pd.read_csv('test_df_distilbert.csv')
+    else:
+        train_df = pd.read_csv('train_df_bert.csv')
+        test_df = pd.read_csv('test_df_bert.csv')
    
     # Tokenize the tweets
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -27,34 +32,59 @@ def make_prediction_for_username_distilbert_nn(username):
     tweet_attention_mask = np.array(tweet_encodings['attention_mask'])
 
     # Create embeddings for tweets
-    bert_model = TFDistilBertModel.from_pretrained('distilbert-base-uncased')    
+    if distilbert:
+        bert_model = TFDistilBertModel.from_pretrained('distilbert-base-uncased')
+    else:
+        bert_model = TFBertModel.from_pretrained('bert-base-uncased')
     tweet_embeddings = bert_model([tweet_features, tweet_attention_mask])[0][:, 0, :]
 
     # Load the saved embeddings from files
-    train_embeddings = np.load('train_embeddings_distilbert_1500rows.npy')
+    if distilbert:
+        train_embeddings = np.load('train_embeddings_distilbert_1500rows.npy')
+        test_embeddings = np.load('test_embeddings_distilbert_1500rows.npy')
+    else:
+        train_embeddings = np.load('train_embeddings_bert_1500rows.npy')
+        test_embeddings = np.load('test_embeddings_bert_1500rows.npy')
 
     # Define the neural network model
-    model = keras.Sequential([
-        keras.layers.Dense(64, activation='relu', input_shape=(768,), 
-                       kernel_regularizer=regularizers.l2(0.0001)),
-        Dropout(0.1),
-        keras.layers.Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.0001)),
-        Dropout(0.1),
-        keras.layers.Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.001)),
-        Dropout(0.1),
-        keras.layers.Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
-        Dropout(0.1),
-        keras.layers.Dense(1, activation='sigmoid')
-    ])
+    if distilbert:
+        model = keras.Sequential([
+            keras.layers.Dense(64, activation='relu', input_shape=(768,), 
+                            kernel_regularizer=regularizers.l2(0.001)),
+            Dropout(0.1),
+            keras.layers.Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.001)),
+            Dropout(0.1),
+            keras.layers.Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
+            Dropout(0.1),
+            keras.layers.Dense(1, activation='sigmoid')
+        ])
+    else:
+        model = keras.Sequential([
+            keras.layers.Dense(64, activation='relu', input_shape=(768,), 
+                            kernel_regularizer=regularizers.l2(0.01)),
+            Dropout(0.3),
+            keras.layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
+            Dropout(0.2),
+            keras.layers.Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.1)),
+            Dropout(0.2),
+            keras.layers.Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.1)),
+            Dropout(0.2),
+            keras.layers.Dense(1, activation='sigmoid')
+        ])
 
     # Compile the neural network model
     model.compile(loss='binary_crossentropy',
-                optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=0.001),
+                optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=0.0001),
                 metrics=['accuracy'])
-
+    
     # Train the neural network model
-    model.fit(train_embeddings, train_df['label'], epochs=100, batch_size=32)
-
+    if distilbert:
+        model.fit(train_embeddings, train_df['label'], epochs=50, batch_size=32,
+            validation_data=(test_embeddings, test_df['label']))
+    else:
+        model.fit(train_embeddings, train_df['label'], epochs=100, batch_size=32,
+            validation_data=(test_embeddings, test_df['label']))
+    
     # Make predictions on tweets
     predictions_prob = model.predict(tweet_embeddings)
     threshold = 0.5

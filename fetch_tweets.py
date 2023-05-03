@@ -8,7 +8,7 @@ bearer_token = "placeholder"
 fetch_tweets_url = "https://api.twitter.com/2/users/{0}/tweets"
 username_url = "https://api.twitter.com/2/users/by/username/{0}"
 
-query_params = {}
+query_params_get_tweets = {"max_results": 20}
 
 def bearer_oauth(r):
     """
@@ -33,7 +33,7 @@ def get_user_id_by_username(username):
         return None
 
 def get_tweets_by_user_id(user_id):
-    response = connect_to_endpoint(fetch_tweets_url.format(user_id), {})
+    response = connect_to_endpoint(fetch_tweets_url.format(user_id), query_params_get_tweets)
     if response is not None:
         tweets = response.get('data')
         tweet_text_list = []
